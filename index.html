@@ -1,80 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CF抽奖模拟器</title>
+
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #020617);
+            color: #e5e7eb;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
         }
 
         h1 {
-            color: #333;
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #38bdf8, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            margin-bottom: 10px;
-        }
-
-        a {
-            text-decoration: none;
-            color: #007BFF;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .instructions {
-            margin-top: 20px;
-            color: #666;
-        }
-
+        /* 警示声明 */
         .warning {
-            margin-top: 20px;
-            color: #FF0000;
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            border-radius: 14px;
+            padding: 18px 20px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #fecaca;
+            font-size: 14px;
+        }
+
+        .warning strong {
+            color: #f87171;
+        }
+
+        /* 抽奖入口 */
+        .action ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .action li a {
+            display: block;
+            padding: 18px 16px;
+            background: linear-gradient(135deg, #1e293b, #020617);
+            border-radius: 16px;
+            text-align: center;
+            text-decoration: none;
+            color: #e5e7eb;
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action li a::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.12), transparent);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .action li a:hover::before {
+            opacity: 1;
+        }
+
+        .action li a:hover {
+            transform: translateY(-4px);
+            border-color: #38bdf8;
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.25);
+            color: #38bdf8;
+        }
+
+        /* 说明 */
+        .instructions {
+            margin-top: 35px;
+            padding: 18px 20px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 14px;
+            color: #cbd5f5;
+        }
+
+        .instructions p {
+            margin: 6px 0;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h1>CF抽奖模拟器</h1>
-    <div class="warning">
+    <div class="container">
+        <h1>CF 抽奖模拟器</h1>
 
-        <p>声明：<br>本页面仅做为模拟概率使用，无任何盈利和消费，抽中的道具也不会发往仓库。<br>请大家理性消费。如有侵权联系即删~vx:DevonL77，可加vx群不迷路，即时享用最新模拟器<br><br>*隼抽奖非官方概率</p>
-
-    </div>
-    <div class="action">
-        <ul>
-            <li><a href="./qiangniang">枪娘抽奖</a></li>
-            <li><a href="./huanling">幻灵抽奖</a></li>
-            <li><a href="./sun">隼(非官方概率)</a></li>
-			<li><a href="./m200huan">冠军之幻(精简版官方概率)</a></li>
-			<li><a href="./lingmou">传说灵眸请参考标准概率</a></li>
-			<li><a href="./Xianglong">幻神-纸灯龙非官方概率</a></li>
-			<li><a href="./mengyan">梦魇-非官方概率</a></li>
-
-
-
-
-
-        <div class="instructions">
-            <p>用优惠券购买直接获得1000钥匙+许愿币。</p>
-            <p>如果页面显示异常，多刷新几次。</p>
-
+        <div class="warning">
+            <strong>声明：</strong><br>
+            本页面仅作为概率模拟展示，无任何盈利与消费行为，抽中的道具不会发往仓库。<br>
+            请大家理性消费。<br>
+            如有侵权请联系即删：vx <strong>DevonL77</strong>（可进群获取最新模拟器）<br><br>
+            * 隼抽奖为非官方概率
         </div>
 
+        <div class="action">
+            <ul>
+                <li><a href="./qiangniang">🔫 枪娘抽奖</a></li>
+                <li><a href="./huanling">✨ 幻灵抽奖</a></li>
+                <li><a href="./sun">🦅 隼（非官方概率）</a></li>
+                <li><a href="./m200huan">🏆 冠军之幻（精简官方概率）</a></li>
+                <li><a href="./lingmou">👁 传说灵眸（标准概率）</a></li>
+                <li><a href="./Xianglong">🐉 幻神·纸灯龙（非官方）</a></li>
+                <li><a href="./mengyan">🌑 梦魇（非官方概率）</a></li>
+            </ul>
+        </div>
 
+        <div class="instructions">
+            <p>🎟 使用优惠券购买可直接获得 1000 钥匙 + 许愿币。</p>
+            <p>🔄 页面显示异常时，请多刷新几次。</p>
+        </div>
 
-
+        <footer>
+            © CF 抽奖模拟器 · 仅供娱乐与概率参考
+        </footer>
+    </div>
 </body>
-
 </html>
