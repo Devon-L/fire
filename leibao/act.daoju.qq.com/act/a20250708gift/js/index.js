@@ -17,22 +17,22 @@ milo.ready(function () {
             shareUrl: "https://app.daoju.qq.com/act/a20250708gift/index.html",
         },
         lotteryMap: {
-            "6704948": { "imgNum": "1", "name": "ӥ", "show": "1" },
-            "6704952": { "imgNum": "2", "name": "AK47-�ױ�����", "show": "2" },
-            "6704980": { "imgNum": "3", "name": "USP-�ױ�����", "show": "3" },
-            "6704981": { "imgNum": "4", "name": "����-��", "show": "4" },
-            "6704982": { "imgNum": "5", "name": "˹̩��-����", "show": "5" },
-            "6704983": { "imgNum": "6", "name": "ն��-�ױ�����", "show": "6" },
-            "6704984": { "imgNum": "7", "name": "���㱦��", "show": "7" },
-            "6705052": { "imgNum": "8", "name": "�߱�����-�ױ�����", "show": "8" },
-            "6705053": { "imgNum": "9", "name": "������-�ױ�����", "show": "9" },
-            "6705055": { "imgNum": "10", "name": "���ⵯ-�ױ�����", "show": "10" },
-            "6705056": { "imgNum": "11", "name": "����֮ʯx1", "show": "0" },
-            "6705062": { "imgNum": "12", "name": "����x100", "show": "0" },
-            "6705063": { "imgNum": "13", "name": "����x15", "show": "0" },
-            "6705064": { "imgNum": "14", "name": "����x9", "show": "0" },
-            "6705065": { "imgNum": "15", "name": "����x8", "show": "0" },
-            "6705066": { "imgNum": "16", "name": "����x7", "show": "0" }
+            "6704948": { "imgNum": "1", "name": "鹰", "show": "1", "weight": 0.2 },
+            "6704952": { "imgNum": "2", "name": "AK47-雷暴王者", "show": "2", "weight": 0.25 },
+            "6704980": { "imgNum": "3", "name": "USP-雷暴王者", "show": "3", "weight": 0.25 },
+            "6704981": { "imgNum": "4", "name": "王者-春", "show": "4", "weight": 0.30 },
+            "6704982": { "imgNum": "5", "name": "斯泰尔-蝴蝶", "show": "5", "weight": 0.30 },
+            "6704983": { "imgNum": "6", "name": "斩神刀-雷暴王者", "show": "6", "weight": 0.60 },
+            "6704984": { "imgNum": "7", "name": "迷你宝贝", "show": "7", "weight": 0.80 },
+            "6705052": { "imgNum": "8", "name": "高爆手雷-雷暴王者", "show": "8", "weight": 1.00 },
+            "6705053": { "imgNum": "9", "name": "烟雾弹-雷暴王者", "show": "9", "weight": 1.20 },
+            "6705055": { "imgNum": "10", "name": "闪光弹-雷暴王者", "show": "10", "weight": 1.50 },
+            "6705056": { "imgNum": "11", "name": "王者之石x1", "show": "0", "weight": 6.40 },
+            "6705062": { "imgNum": "12", "name": "积分x100", "show": "0", "weight": 0.20 },
+            "6705063": { "imgNum": "13", "name": "积分x15", "show": "0", "weight": 2.00 },
+            "6705064": { "imgNum": "14", "name": "积分x9", "show": "0", "weight": 10.00 },
+            "6705065": { "imgNum": "15", "name": "积分x8", "show": "0", "weight": 35.00 },
+            "6705066": { "imgNum": "16", "name": "积分x7", "show": "0", "weight": 40.00 }
         }
     }
     //alert = Milo.sAlert;
@@ -379,8 +379,30 @@ var Hx = {
             return;
         }
         var arr = [];
+        // 加权抽取函数（放回抽取）
+        function pickWeighted(m) {
+            var ks = Object.keys(m);
+            var total = 0;
+            var ws = [];
+            for (var i = 0; i < ks.length; i++) {
+                var w = Number((m[ks[i]] && m[ks[i]].weight) || 0);
+                // 若没有显式权重，默认使用 0（避免影响公示概率）
+                ws.push(w);
+                total += w;
+            }
+            // 若总权重为 0，则退回均匀随机
+            if (total <= 0) {
+                return ks[Math.floor(Math.random() * ks.length)];
+            }
+            var r = Math.random() * total;
+            for (var j = 0; j < ks.length; j++) {
+                r -= ws[j];
+                if (r <= 0) return ks[j];
+            }
+            return ks[ks.length - 1];
+        }
         for (var i = 0; i < num; i++) {
-            var randId = ids[Math.floor(Math.random() * ids.length)];
+            var randId = pickWeighted(map);
             var item = map[randId] || {};
             arr.push({ id: randId, name: item.name || ('物品' + randId), imgNum: item.imgNum || '1', show: item.show || '0', class: item.class, nTotalInALL: item.nTotalInALL || 0 });
         }
@@ -585,6 +607,13 @@ var Hx = {
                     $(this).remove();
                     $li.append('<div class="lottery-fallback">' + (item.name || '奖品') + '</div>');
                 });
+                // 将十连抽奖品保存到本地暂存箱（本地模式）
+                try {
+                    if (typeof Hx._local_saveToTemp === 'function') {
+                        Hx._local_saveToTemp(dj_arr);
+                        $("#lottery10 .fc_txt2").prepend('<span class="sent-to-temp" style="color:#FF6600;margin-right:10px;">已发送至暂存箱</span>');
+                    }
+                } catch(e){}
                 $("#lottery10 a").attr("href", "javascript: Hx.showLottery();");
                 TGDialogS("lottery10");
                 Hx.show_dj.dj_arr = [];
@@ -1445,8 +1474,30 @@ if (typeof Hx !== 'undefined') {
             return;
         }
         var arr = [];
+        // 加权抽取函数（放回抽取）
+        function pickWeighted(m) {
+            var ks = Object.keys(m);
+            var total = 0;
+            var ws = [];
+            for (var i = 0; i < ks.length; i++) {
+                var w = Number((m[ks[i]] && m[ks[i]].weight) || 0);
+                // 若没有显式权重，默认使用 0（避免影响公示概率）
+                ws.push(w);
+                total += w;
+            }
+            // 若总权重为 0，则退回均匀随机
+            if (total <= 0) {
+                return ks[Math.floor(Math.random() * ks.length)];
+            }
+            var r = Math.random() * total;
+            for (var j = 0; j < ks.length; j++) {
+                r -= ws[j];
+                if (r <= 0) return ks[j];
+            }
+            return ks[ks.length - 1];
+        }
         for (var i = 0; i < num; i++) {
-            var randId = ids[Math.floor(Math.random() * ids.length)];
+            var randId = pickWeighted(map);
             var item = map[randId] || {};
             arr.push({ id: randId, name: item.name || ('物品' + randId), imgNum: item.imgNum || '1', show: item.show || '0', class: item.class, nTotalInALL: item.nTotalInALL || 0 });
         }
