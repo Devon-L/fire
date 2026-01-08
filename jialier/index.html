@@ -157,22 +157,7 @@
 			</div>
 		</div>
 
-		<!-- 本地调试面板（仅用于本地验证，无网络模式） -->
-		<div id="local-debug-panel" style="position:fixed;right:10px;bottom:10px;z-index:9999;background:rgba(0,0,0,0.6);color:#fff;padding:10px;border-radius:6px;font-size:13px;">
-			<div style="margin-bottom:6px;font-weight:bold;">本地调试面板</div>
-			<div style="margin-bottom:6px;">钥匙数: <input id="dbg-keys" type="number" value="0" style="width:60px;"> <button id="dbg-set-keys">设置</button></div>
-			<div style="margin-bottom:6px;">购买: <select id="dbg-buy-propid"><option value="1362867">10Q</option><option value="1362866">100Q</option><option value="1362870">500Q</option><option value="1362868">10Q(代金券)</option><option value="1362869">100Q(代金券)</option></select> <button id="dbg-buy">购买</button></div>
-			<div style="margin-bottom:6px;">抽奖次数: <input id="dbg-lottery-num" type="number" value="1" style="width:60px;"> <button id="dbg-lottery">抽奖</button></div>
-			<div style="margin-bottom:6px;">LocalMode: <input id="dbg-localmode" type="checkbox" checked> (跳过网络请求)</div>
-			<div style="margin-top:6px;">日志: <a href="javascript:void(0);" id="dbg-show-log">显示</a></div>
-			<div id="dbg-log" style="max-height:150px;overflow:auto;margin-top:6px;background:#111;padding:6px;border-radius:4px;display:none;"></div>
-		</div>
-		<div class="flot" id="flokf">
-			<div class="fc">
-				<a href="javascript:;" class="btn_gb"></a>
-				<a href="https://kf.qq.com/touch/kfgames/A1109/v2/PCweb/conf/index.html?scene_id=CSCE20260105091408hYtSxiH" target="_blank" class="btn_lx"></a>
-			</div>
-		</div>
+		<!-- 本地调试面板（已移除：联系客服浮窗） -->
 		
 		
 		<!-- <div class="bgbxgiff" id="flogif">
@@ -566,15 +551,15 @@
 				var flogif = document.getElementById("flogif");
 				var score = document.documentElement.scrollTop || document.body.scrollTop;
 				if(score < 660) {
-					fixE.style.display = "none";
-					flogif.style.display = "none";
+					if(fixE) fixE.style.display = "none";
+					if(flogif) flogif.style.display = "none";
 					if(typeof dom != 'undefined') {
 						dom.css('display', 'none')
 					}
 					//$(".anchor-fixedbar").hide();
 				} else {
-					fixE.style.display = "block";
-					flogif.style.display = "block";
+					if(fixE) fixE.style.display = "block";
+					if(flogif) flogif.style.display = "block";
 					if(typeof dom != 'undefined') {
 						dom.css('display', 'block')
 					}
@@ -608,49 +593,6 @@
 		</script>
 
 		<!-- 本地调试脚本 -->
-		<script>
-		(function(){
-			function log(msg){
-				console.log(msg);
-				var el = document.getElementById('dbg-log');
-				if(!el) return;
-				el.style.display='block';
-				var p = document.createElement('div');
-				p.textContent = (new Date()).toLocaleTimeString() + ' - ' + msg;
-				p.style.borderBottom='1px solid #222';
-				p.style.padding='2px 0';
-				el.insertBefore(p, el.firstChild);
-			}
-			document.getElementById('dbg-set-keys').addEventListener('click', function(){
-				var v = parseInt(document.getElementById('dbg-keys').value) || 0;
-				document.querySelector('.jf_7817').innerText = v;
-				Hx.jf_7817 = v;
-				log('设置钥匙为 ' + v);
-			});
-			document.getElementById('dbg-buy').addEventListener('click', function(){
-				var prop = document.getElementById('dbg-buy-propid').value;
-				try{ Hx.buyKey(parseInt(prop)); log('调用 Hx.buyKey('+prop+')'); }catch(e){ log('buyKey error:' + e); }
-			});
-			document.getElementById('dbg-lottery').addEventListener('click', function(){
-				var num = parseInt(document.getElementById('dbg-lottery-num').value) || 1;
-				try{ Hx.lottery(num); log('调用 Hx.lottery('+num+')'); }catch(e){ log('lottery error:' + e); }
-			});
-			document.getElementById('dbg-localmode').addEventListener('change', function(e){
-				var checked = e.target.checked;
-				if(!Milo.aParams) Milo.aParams = {};
-				Milo.aParams.localMode = checked;
-				log('localMode = ' + checked);
-			});
-			document.getElementById('dbg-show-log').addEventListener('click', function(){
-				var el = document.getElementById('dbg-log');
-				el.style.display = el.style.display === 'none' ? 'block' : 'none';
-			});
-			// 初始化panel状态
-			if(Milo && Milo.aParams){
-				document.getElementById('dbg-localmode').checked = !!Milo.aParams.localMode;
-			}
-		})();
-		</script>
 
 		<!-- 离线回退 shim：在 file:// 或无外部依赖时提供最小接口保证购买/抽奖可用 -->
 		<script>
