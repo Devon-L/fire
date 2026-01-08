@@ -19,22 +19,22 @@ milo.ready(function () {
             shareUrl: "https://app.daoju.qq.com/act/a20251224cfactivity/index.html",
         },
         lotteryMap: {
-            "7448924": { "imgNum": "1", "show": "1", "name": "加利尔ACE-天袭" },
-            "7451467": { "imgNum": "2", "show": "2", "name": "FAMAS G2-天戎" },
-            "7451468": { "imgNum": "3", "show": "3", "name": "VSK-94-金蚀" },
-            "7451469": { "imgNum": "4", "show": "4", "name": "机械姬" },
-            "7451470": { "imgNum": "5", "show": "5", "name": "QBZ03-天罚" },
-            "7451472": { "imgNum": "6", "show": "6", "name": "金蚀-机械姬" },
-            "7451474": { "imgNum": "7", "show": "7", "name": "QBZ03-天罚音效卡" },
-            "7451475": { "imgNum": "8", "show": "8", "name": "M4A1-猎神" },
-            "7451480": { "imgNum": "9", "show": "9", "name": "沙鹰-天神" },
-            "7451481": { "imgNum": "10", "show": "10", "name": "机械姬玩偶" },
-            "7451482": { "imgNum": "11", "show": "0", "name": "王者之石x1" },
-            "7451483": { "imgNum": "12", "show": "0", "name": "神匠值x100" },
-            "7451485": { "imgNum": "13", "show": "0", "name": "神匠值x15" },
-            "7451486": { "imgNum": "14", "show": "0", "name": "神匠值x9" },
-            "7451487": { "imgNum": "15", "show": "0", "name": "神匠值x8" },
-            "7451488": { "imgNum": "16", "show": "0", "name": "神匠值x7" }
+            "7448924": { "imgNum": "1", "show": "1", "name": "加利尔ACE-天袭", "prob": 0.20 },
+            "7451467": { "imgNum": "2", "show": "2", "name": "FAMAS G2-天戎", "prob": 0.25 },
+            "7451468": { "imgNum": "3", "show": "3", "name": "VSK-94-金蚀", "prob": 0.30 },
+            "7451469": { "imgNum": "4", "show": "4", "name": "机械姬", "prob": 0.30 },
+            "7451470": { "imgNum": "5", "show": "5", "name": "QBZ03-天罚", "prob": 0.35 },
+            "7451472": { "imgNum": "6", "show": "6", "name": "金蚀-机械姬", "prob": 0.35 },
+            "7451474": { "imgNum": "7", "show": "7", "name": "QBZ03-天罚音效卡", "prob": 0.40 },
+            "7451475": { "imgNum": "8", "show": "8", "name": "M4A1-猎神", "prob": 0.80 },
+            "7451480": { "imgNum": "9", "show": "9", "name": "沙鹰-天神", "prob": 1.00 },
+            "7451481": { "imgNum": "10", "show": "10", "name": "机械姬玩偶", "prob": 1.50 },
+            "7451482": { "imgNum": "11", "show": "0", "name": "王者之石x1", "prob": 7.35 },
+            "7451483": { "imgNum": "12", "show": "0", "name": "神匠值x100", "prob": 0.20 },
+            "7451485": { "imgNum": "13", "show": "0", "name": "神匠值x15", "prob": 2.00 },
+            "7451486": { "imgNum": "14", "show": "0", "name": "神匠值x9", "prob": 10.00 },
+            "7451487": { "imgNum": "15", "show": "0", "name": "神匠值x8", "prob": 35.00 },
+            "7451488": { "imgNum": "16", "show": "0", "name": "神匠值x7", "prob": 40.00 }
         },
         tips1: "本活动结束时间为:2026.02.08 23:59:59；<br/>超过活动期限的抽奖钥匙、暂存箱内未领取奖励等都将作废，请及时使用/领取；本活动结束后，神匠值在本活动无法使用，可前往《神工天巧套装返场》继续使用；"
     }
@@ -385,11 +385,36 @@ var Hx = {
                 return;
             }
 
-            // 随机抽取 want 个奖品
+            // 加权随机抽取 want 个奖品（使用 Milo.aParams.lotteryMap 中的 prob 字段）
             var arr = [];
             var nTotalInALL = Math.floor(Math.random() * 100) + 1; // 随机累计次数展示用
+
+            // 构建权重数组（prob 可视为百分比或权重）
+            var weights = [];
+            var totalWeight = 0;
+            for (var j = 0; j < pool.length; j++) {
+                var pInfo = (Milo.aParams.lotteryMap && Milo.aParams.lotteryMap[pool[j].id]) || {};
+                var w = parseFloat(pInfo.prob) || 0;
+                weights.push(w);
+                totalWeight += w;
+            }
+
+            // 如果 totalWeight 为 0（未设置 prob 或均为 0），回退到均匀随机
+            function pickIndexByWeight() {
+                if (totalWeight <= 0) {
+                    return Math.floor(Math.random() * pool.length);
+                }
+                var r = Math.random() * totalWeight;
+                var s = 0;
+                for (var k = 0; k < weights.length; k++) {
+                    s += weights[k];
+                    if (r <= s) return k;
+                }
+                return weights.length - 1;
+            }
+
             for (var i = 0; i < want; i++) {
-                var idx = Math.floor(Math.random() * pool.length);
+                var idx = pickIndexByWeight();
                 var picked = pool[idx];
                 arr.push({
                     id: picked.id,
@@ -567,9 +592,9 @@ var Hx = {
             if (dj_arr.length == 1) {
                 $("#lottery1 .lot1").html("");
                 $.each(dj_arr, function (k, v) {
-                        var _html = '<li>\
-                                <img src="https://game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/lot/lot' + v["imgNum"] + '.png" alt="">\
-                            </li>';
+                    var _html = '<li>\
+                                        <img src="//game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/lot/lot' + v["imgNum"] + '.png" alt="">\
+                                </li>';
                     $("#lottery1 .lot1").append(_html);
                 })
                 $("#lottery1 a").attr("href", "javascript: Hx.showLottery();");
@@ -578,9 +603,9 @@ var Hx = {
             } else {
                 $("#lottery10 .lot10").html("");
                 $.each(dj_arr, function (k, v) {
-                        var _html = '<li>\
-                                <img src="https://game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/lot/lot' + v["imgNum"] + '.png" alt="">\
-                            </li>';
+                    var _html = '<li>\
+                                        <img src="//game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/lot/lot' + v["imgNum"] + '.png" alt="">\
+                                </li>';
                     $("#lottery10 .lot10").append(_html);
                 })
                 $("#lottery10 a").attr("href", "javascript: Hx.showLottery();");
@@ -932,9 +957,9 @@ function saveImageWithText(djimg, ewmimg, labelimg, textParts) {
     img2.crossOrigin = "anonymous";
     img3.crossOrigin = "anonymous";
 
-    // img1.src = "https://game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/lot/fc_yx1.png" + '?t=' + Date.now();
-    // img2.src = "https://game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/ewm.png" + '?t=' + Date.now();
-    // img3.src = "https://game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/label1.png" + '?t=' + Date.now();
+    // img1.src = "//game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/lot/fc_yx1.png" + '?t=' + Date.now();
+    // img2.src = "//game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/ewm.png" + '?t=' + Date.now();
+    // img3.src = "//game.gtimg.cn/images/actdaoju/act/a20251224cfactivity/label1.png" + '?t=' + Date.now();
 
     img1.src = djimg + '?t=' + Date.now();
     img2.src = ewmimg + '?t=' + Date.now();
